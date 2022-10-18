@@ -1,7 +1,7 @@
 %% step 0 - set up path 
 clear all; close all; clc;
 addpath(genpath(pwd));
-gitDir = '/Users/pw1246/Documents/Github';
+gitDir = '~/Documents/Github';
 fsDir = '/Applications/freesurfer/7.2.0';
 set_up(gitDir,fsDir)
 
@@ -9,12 +9,12 @@ subjid = 'sub-0201';
 ses = 'ses-01';
 
   %%%%%%%%%%%%%%%%%
-% Download the data 
+% Download the data  to ~/Desktop
 % https://drive.google.com/file/d/1Ot5_QWl6whpB5qEXUEwQuzUJyis-oKJp/view?usp=sharing
   %%%%%%%%%%%%%%%%%
   
 % define path to the downloaded folder here:
-bidsDir = '/Users/pw1246/Desktop/glm-Localizer-Tutorial-Data';
+bidsDir = '~/Desktop/glm-Localizer-Tutorial-Data';
 
 %% step 1 - load data and design matrix
 
