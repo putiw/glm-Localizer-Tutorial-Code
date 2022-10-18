@@ -1,7 +1,6 @@
 % GLM Localizer Tutorial Code
 %
 % Requires:
-% freesurfer 7.2.0 - https://surfer.nmr.mgh.harvard.edu/fswiki/rel7downloads
 % knkutils - https://github.com/cvnlab/knkutils
 % cvncode - https://github.com/cvnlab/cvncode
 % GLMdenoise - https://github.com/cvnlab/GLMdenoise
@@ -13,18 +12,17 @@
   %%%%%%%%%%%%%%%%%
 
   %%%%%%%%%%%%%%%%%
-% Download the data  to ~/Desktop
+% Download data to ~/Desktop
 % https://drive.google.com/file/d/1Ot5_QWl6whpB5qEXUEwQuzUJyis-oKJp/view?usp=sharing
   %%%%%%%%%%%%%%%%%
 
 %% step 0 - set up path 
 clear all; close all; clc;
 addpath(genpath(pwd));
-gitDir = '~/Documents/Github';
-fsDir = '/Applications/freesurfer/7.2.0';
-% fsDir = '/Volumes/Vision/Software/freesurfer/7.2.0';
-% define path to the downloaded folder here:
-bidsDir = '~/Desktop/glm-Localizer-Tutorial-Data';
+
+gitDir = '~/Documents/Github'; % GitHub path
+fsDir = '/Applications/freesurfer/7.2.0'; % freesurfer path
+bidsDir = '~/Desktop/glm-Localizer-Tutorial-Data'; % data path
 
 subjid = 'sub-0201';
 ses = 'ses-01';
@@ -51,38 +49,33 @@ xlabel('TR');
 title('Time series of some vertices');
 
 
-% convert time series to percentage signal change
-
+% convert time series to % signal change
 percentageChange = (datafiles{1}./mean(datafiles{1},2)-1)*100;
 
 figure(2), clf
 plot(percentageChange(tmpRange,:)')
-ylabel('fMRI response (% change in image intensity');
+ylabel('fMRI response (% BOLD change)');
 xlabel('Frame');
 title('Time series of all voxels in the ROI');
 
 % plot mean
-
 hold on
 plot(nanmean(percentageChange),'w','linewidth',2);
 
-
 % plot design matrix 
-
 figure(3), clf
 imagesc(dms{1})
 
-
 %% step 2.5 do some budget version of glm before moving on to glm denoise
 
-% make some generic hrf
+% make a generic hrf
 tau = 2;
 delta = 2;
 t = [0:1:30];
-tshift = max(t-delta,0)
+tshift = max(t-delta,0);
 hrf = (tshift/2).^2 .* exp(-tshift/2) / (2*2);
 
-% plot it
+% plot hrf
 figure(1); clf;
 plot(t,hrf);
 title('hrf')
@@ -91,25 +84,26 @@ xlabel('time')
 
 % convolve design matrix with hrf
 dmsX = conv2(dms{1},hrf');
-dmsX = dmsX(1:300,:);
+dmsX = dmsX(1:300,:); % truncate at run duration
 
 % add some linear drift.
-drift = 1:300;
+drif = linspace(0,1,300); %1:300;
 
 % add baseline
 baseline = ones(300,1);
 
 % now we have a model:
-model = [dmsX drift' baseline];
+model = [dmsX drif' baseline];
 
 % because y = X b, so b = pinv(X) * y
 budgetBetas = (pinv(model) * percentageChange')';
+
 %% now contrast between conditions and plot it
 figure(1);clf
 motion = nanmean(budgetBetas(:,[1]),2);
 stationary = nanmean(budgetBetas(:,[2]),2);
  
-C = [1 -1]'
+C = [1 -1]'; 
 contrast = C' * [motion stationary]';
 
 contrast(contrast==0) = -50;
@@ -177,7 +171,7 @@ hcb=colorbar('SouthOutside');
 hcb.Ticks = [0:0.25:1];
 % hcb.TickLabels = {'}
 hcb.FontSize = 25
-hcb.Label.String = 'R2%'
+hcb.Label.String = 'R^2'
 hcb.TickLength = 0.001;
 
 title(subjid)
@@ -195,7 +189,7 @@ contrast = C' * [motion stationary]';
 alltcs = nanmean(cat(3,datafiles{:}),3);
 predttcs = dms{1} * myresults.modelmd{2}';
 
-datatoplot = contrast' .* double(myresults.R2>0);
+datatoplot = contrast' .* double(myresults.R2>0); % mask by R^2
 
 datatoplot(datatoplot==0) = -50;
 datatoplot(isnan(datatoplot)) = -50;
@@ -246,7 +240,7 @@ hold on
 
 stem(dms{1}(:,1))
 
-legend({'Average timecourse from 100 most responsible voxels in MT';'Centrally moving dots predictior'})
+legend({'Timecourse from 100 most responsive voxels';'Centrally moving dots predictior'})
 legend box off
 ylabel('%BOLD')
 xlabel('TRs')
