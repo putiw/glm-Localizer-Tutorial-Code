@@ -32,12 +32,11 @@ set_up(gitDir,fsDir,bidsDir)
 %% step 1 - load data and design matrix
 
 load([bidsDir '/derivatives/data.mat']) % this is a 1x1 cell with size 302958 (vertices) by 300 (TR)
-
-load dms  % this is a 1x1 cell with size 300 (TR) by 6 (conditions)
+load('add_me/dms.mat');  % this is a 1x1 cell with size 300 (TR) by 6 (conditions)
 
 %% step 2 - take a look at the raw data and design matrix
 
-% try to plot the time series of some vertices here 
+% plot the time series of some vertices here 
 
 figure(1), clf
 
@@ -47,7 +46,6 @@ plot(datafiles{1}(tmpRange,:)')
 ylabel('Raw fMRI signal');
 xlabel('TR');
 title('Time series of some vertices');
-
 
 % convert time series to % signal change
 percentageChange = (datafiles{1}./mean(datafiles{1},2)-1)*100;
@@ -98,18 +96,18 @@ model = [dmsX drif' baseline];
 % because y = X b, so b = pinv(X) * y
 budgetBetas = (pinv(model) * percentageChange')';
 
-%% now contrast between conditions and plot it
+%% contrast between conditions and plot
 figure(1);clf
 motion = nanmean(budgetBetas(:,[1]),2);
 stationary = nanmean(budgetBetas(:,[2]),2);
  
-C = [1 -1]'; 
+C = [-1 1]'; 
 contrast = C' * [motion stationary]';
 
 contrast(contrast==0) = -50;
 contrast(isnan(contrast)) = -50;
 
-bins = -5:0.1:5
+bins = -5:0.1:5;
 cmap0 = cmaplookup(bins,min(bins),max(bins),[],(cmapsign4));
 [rawimg,Lookup,rgbimg] = cvnlookup(subjid,1,contrast',[min(bins) max(bins)],cmap0,min(bins),[],0,{'roiname',{'Kastner2015'},'roicolor',{'w'},'drawrpoinames',0,'roiwidth',{5},'fontsize',20});
 
@@ -123,7 +121,7 @@ end
 
 a = imagesc(rgbimg); axis image tight;
 
-    
+% format figure
 set(gcf,'Position',[277 119 1141 898])
 axis off
 hold on
@@ -131,14 +129,19 @@ plot(0,0);
 colormap(cmap0);
 hcb=colorbar('SouthOutside');
 hcb.Ticks = [0 1];
-hcb.TickLabels = {'-0.5';'0.5'}
-hcb.FontSize = 25
-hcb.Label.String = 'Moving dots vs. stationary'
+hcb.TickLabels = {'-0.5';'0.5'};
+hcb.FontSize = 25;
+hcb.Label.String = 'Moving vs. stationary dots';
 hcb.TickLength = 0.001;
 
 %% step 3 - run kendrick's glm 
+stimdur = 1; % in sec
+tr = 1; % in sec
+hrfmodel = 'assume';
+hrfknobs = [];
+resampling = 0;
 
-  myresults = GLMestimatemodel(dms,datafiles,1,1,'assume',[],0);
+myresults = GLMestimatemodel(dms,datafiles,stimdur,tr,hrfmodel,hrfknobs,resampling);
      
   
 %% step 4 - take a look at R2, contrasts, and estimated betas
@@ -170,8 +173,8 @@ colormap(cmap0);
 hcb=colorbar('SouthOutside');
 hcb.Ticks = [0:0.25:1];
 % hcb.TickLabels = {'}
-hcb.FontSize = 25
-hcb.Label.String = 'R^2'
+hcb.FontSize = 25;
+hcb.Label.String = 'R^2';
 hcb.TickLength = 0.001;
 
 title(subjid)
@@ -183,7 +186,7 @@ betas = myresults.modelmd{2};
 motion = nanmean(betas(:,[1]),2);
 stationary = nanmean(betas(:,[2]),2);
  
-C = [1 -1]'
+C = [1 -1]';
 contrast = C' * [motion stationary]';
 
 alltcs = nanmean(cat(3,datafiles{:}),3);
@@ -194,7 +197,8 @@ datatoplot = contrast' .* double(myresults.R2>0); % mask by R^2
 datatoplot(datatoplot==0) = -50;
 datatoplot(isnan(datatoplot)) = -50;
 
-bins = -0.5:0.01:0.5
+bins = -0.5:0.01:0.5;
+bins = -1:0.01:1;
 cmap0 = cmaplookup(bins,min(bins),max(bins),[],(cmapsign4));
 [rawimg,Lookup,rgbimg] = cvnlookup(subjid,1,datatoplot,[min(bins) max(bins)],cmap0,min(bins),[],0,{'roiname',{'MT_exvivo'},'roicolor',{'w'},'drawrpoinames',0,'roiwidth',{5},'fontsize',20});
 
@@ -217,10 +221,11 @@ plot(0,0);
 colormap(cmap0);
 hcb=colorbar('SouthOutside');
 hcb.Ticks = [0 1];
-hcb.TickLabels = {'-0.5';'0.5'}
-hcb.FontSize = 25
-hcb.Label.String = 'Moving dots vs. stationary'
-hcb.TickLength = 0.001;
+hcb.TickLabels = {'-0.5';'0.5'};
+hcb.FontSize = 25;
+hcb.Label.String = 'Moving vs. stationary dots';
+% hcb.TickLength = 0.005;
+hcb.TickDirection = 'out';
 
 
 %%
@@ -248,7 +253,7 @@ set(gca,'Fontsize',15)
 
  
 %% step 5 - save the estimated responses into mgz files for future use
-conditions = {'central_moving';'central_stationary';'left_moving';'left_stationary';'right_moving';'right_stationary'}
+conditions = {'central_moving';'central_stationary';'left_moving';'left_stationary';'right_moving';'right_stationary'};
 
 resultsdir = sprintf('%s/derivatives/GLMdenoise/%s/%s/',bidsDir,subjid,ses);
 fspth = fullfile(bidsDir, 'derivatives', 'freesurfer', subjid);
@@ -283,7 +288,7 @@ MRIwrite(mgz, fullfile(resultsdir, sprintf('rh.%s.mgz','vexpl_mask')));
 pairs =[[1 2];[3 4];[5 6]]
 
 
-C = [1 -1]'
+C = [1 -1]';
 
 betas = myresults.modelmd{2};
 for p = 1 : size(pairs,1)
