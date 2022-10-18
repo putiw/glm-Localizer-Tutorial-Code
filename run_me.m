@@ -1,3 +1,9 @@
+% GLM Localizer Tutorial Code
+%
+% Requires:
+% knkutils - https://github.com/cvnlab/knkutils
+
+
 %% step 0 - set up path 
 clear all; close all; clc;
 addpath(genpath(pwd));
