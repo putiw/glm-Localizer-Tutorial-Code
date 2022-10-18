@@ -2,7 +2,7 @@
 %
 % Requires:
 % knkutils - https://github.com/cvnlab/knkutils
-
+% cvncode - https://github.com/cvnlab/cvncode
 
 %% step 0 - set up path 
 clear all; close all; clc;
@@ -10,6 +10,8 @@ addpath(genpath(pwd));
 gitDir = '~/Documents/Github';
 fsDir = '/Applications/freesurfer/7.2.0';
 set_up(gitDir,fsDir)
+addpath(genpath(fullfile(gitDir, 'knkutils')));
+addpath(genpath(fullfile(gitDir, 'cvncode')));
 
 subjid = 'sub-0201';
 ses = 'ses-01';
