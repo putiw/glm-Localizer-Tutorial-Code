@@ -10,12 +10,3 @@ addpath(genpath(fullfile(gitDir, 'GLMdenoise'))); % https://github.com/cvnlab/GL
 addpath(genpath(fullfile(gitDir, 'nsdcode'))); % https://github.com/cvnlab/nsdcode
 
 end
-
-
-https://github.com/putiw/glm-Localizer-Tutorial-Code
-https://github.com/cvnlab/cvncode
-https://github.com/cvnlab/knkutils
-https://github.com/cvnlab/GLMdenoise
-https://github.com/cvnlab/nsdcode
-
-https://drive.google.com/file/d/1Ot5_QWl6whpB5qEXUEwQuzUJyis-oKJp/view?usp=sharing

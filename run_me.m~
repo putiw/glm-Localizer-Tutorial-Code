@@ -88,8 +88,8 @@ model = [dmsX drift' baseline];
 % because y = X b, so b = pinv(X) * y
 budgetBetas = (pinv(model) * percentageChange')';
 %% now contrast between conditions and plot it
-figure(1);clf
-motion = nanmean(budgetBetas(:,[1]),2);
+
+motion = nanmean(budgetBetas(:,[]),2);
 stationary = nanmean(budgetBetas(:,[2]),2);
  
 C = [1 -1]'
@@ -98,7 +98,7 @@ contrast = C' * [motion stationary]';
 contrast(contrast==0) = -50;
 contrast(isnan(contrast)) = -50;
 
-bins = -5:0.1:5
+bins = -0.5:0.01:0.5
 cmap0 = cmaplookup(bins,min(bins),max(bins),[],(cmapsign4));
 [rawimg,Lookup,rgbimg] = cvnlookup(subjid,1,contrast',[min(bins) max(bins)],cmap0,min(bins),[],0,{'roiname',{'Kastner2015'},'roicolor',{'w'},'drawrpoinames',0,'roiwidth',{5},'fontsize',20});
 
@@ -116,6 +116,7 @@ a = imagesc(rgbimg); axis image tight;
 set(gcf,'Position',[277 119 1141 898])
 axis off
 hold on
+% subplot(2,1,2)
 plot(0,0);
 colormap(cmap0);
 hcb=colorbar('SouthOutside');
