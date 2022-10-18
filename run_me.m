@@ -1,6 +1,7 @@
 % GLM Localizer Tutorial Code
 %
 % Requires:
+% freesurfer 7.2.0 - https://surfer.nmr.mgh.harvard.edu/fswiki/rel7downloads
 % knkutils - https://github.com/cvnlab/knkutils
 % cvncode - https://github.com/cvnlab/cvncode
 
@@ -8,7 +9,8 @@
 clear all; close all; clc;
 addpath(genpath(pwd));
 gitDir = '~/Documents/Github';
-fsDir = '/Applications/freesurfer/7.2.0';
+%fsDir = '/Applications/freesurfer/7.2.0';
+fsDir = '/Volumes/Vision/Software/freesurfer/7.2.0';
 set_up(gitDir,fsDir)
 addpath(genpath(fullfile(gitDir, 'knkutils')));
 addpath(genpath(fullfile(gitDir, 'cvncode')));
