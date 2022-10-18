@@ -4,27 +4,32 @@
 % freesurfer 7.2.0 - https://surfer.nmr.mgh.harvard.edu/fswiki/rel7downloads
 % knkutils - https://github.com/cvnlab/knkutils
 % cvncode - https://github.com/cvnlab/cvncode
+% GLMdenoise - https://github.com/cvnlab/GLMdenoise
+% nsdcode - https://github.com/cvnlab/nsdcode
 
-%% step 0 - set up path 
-clear all; close all; clc;
-addpath(genpath(pwd));
-gitDir = '~/Documents/Github';
-%fsDir = '/Applications/freesurfer/7.2.0';
-fsDir = '/Volumes/Vision/Software/freesurfer/7.2.0';
-set_up(gitDir,fsDir)
-addpath(genpath(fullfile(gitDir, 'knkutils')));
-addpath(genpath(fullfile(gitDir, 'cvncode')));
-
-subjid = 'sub-0201';
-ses = 'ses-01';
+  %%%%%%%%%%%%%%%%%
+% Download freesurfer matlab functions to /Applications/freesurfer
+% https://drive.google.com/file/d/1ZKh6hxEfB8h9MjcC3t_x1XqPbun-RdX2/view?usp=sharing
+  %%%%%%%%%%%%%%%%%
 
   %%%%%%%%%%%%%%%%%
 % Download the data  to ~/Desktop
 % https://drive.google.com/file/d/1Ot5_QWl6whpB5qEXUEwQuzUJyis-oKJp/view?usp=sharing
   %%%%%%%%%%%%%%%%%
-  
+
+%% step 0 - set up path 
+clear all; close all; clc;
+addpath(genpath(pwd));
+gitDir = '~/Documents/Github';
+fsDir = '/Applications/freesurfer/7.2.0';
+% fsDir = '/Volumes/Vision/Software/freesurfer/7.2.0';
 % define path to the downloaded folder here:
 bidsDir = '~/Desktop/glm-Localizer-Tutorial-Data';
+
+subjid = 'sub-0201';
+ses = 'ses-01';
+
+set_up(gitDir,fsDir,bidsDir)
 
 %% step 1 - load data and design matrix
 
@@ -249,7 +254,6 @@ set(gca,'Fontsize',15)
 
  
 %% step 5 - save the estimated responses into mgz files for future use
-setenv('SUBJECTS_DIR',[bidsDir '/derivatives/freesurfer'])
 conditions = {'central_moving';'central_stationary';'left_moving';'left_stationary';'right_moving';'right_stationary'}
 
 resultsdir = sprintf('%s/derivatives/GLMdenoise/%s/%s/',bidsDir,subjid,ses);
