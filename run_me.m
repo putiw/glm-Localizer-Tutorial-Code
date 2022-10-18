@@ -1,9 +1,11 @@
 %% step 0 - set up path 
 clear all; close all; clc;
 addpath(genpath(pwd));
-setenv('PATH', ['/Applications/freesurfer/7.2.0/bin' getenv('PATH')]);
-setenv('FREESURFER_HOME','/Applications/freesurfer/7.2.0')
-subj = 'sub-0201';
+gitDir = '/Users/pw1246/Documents/Github';
+fsDir = '/Applications/freesurfer/7.2.0';
+set_up(gitDir,fsDir)
+
+subjid = 'sub-0201';
 ses = 'ses-01';
 
 % download example data here: 
@@ -19,13 +21,14 @@ load dms  % this is a 1x1 cell with size 300 (TR) by 6 (conditions)
 
 %% step 2 - take a look at the raw data and design matrix
 
-figure(1)
+
 
 
 %% step 3 - run kendrick's glm 
 
   myresults = GLMestimatemodel(dms,datafiles,1,1,'assume',[],0);
      
+  
 %% step 4 - take a look at R2, contrasts, and estimated betas
 
 close all
@@ -36,7 +39,7 @@ cmap0 = cmaplookup(bins,min(bins),max(bins),[],hot);
 
 datatoplot(isnan(datatoplot)) = 0;
 
-[rawimg,Lookup,rgbimg] = cvnlookup(subj,1,datatoplot,[min(bins) max(bins)],cmap0,0,[],0,{'roiname',{'MT_exvivo'},'roicolor',{'w'},'drawrpoinames',0,'roiwidth',{5},'fontsize',20}); %MT_exvivo %Kastner2015
+[rawimg,Lookup,rgbimg] = cvnlookup(subjid,1,datatoplot,[min(bins) max(bins)],cmap0,0,[],0,{'roiname',{'MT_exvivo'},'roicolor',{'w'},'drawrpoinames',0,'roiwidth',{5},'fontsize',20}); %MT_exvivo %Kastner2015
 
 color = [0.5];
 [r,c,t] = size(rgbimg);
@@ -59,7 +62,7 @@ hcb.FontSize = 25
 hcb.Label.String = 'R2%'
 hcb.TickLength = 0.001;
 
-title(subj)
+title(subjid)
 
 %%
 figure(2); clf
@@ -81,7 +84,7 @@ datatoplot(isnan(datatoplot)) = -50;
 
 bins = -0.5:0.01:0.5
 cmap0 = cmaplookup(bins,min(bins),max(bins),[],(cmapsign4));
-[rawimg,Lookup,rgbimg] = cvnlookup(subj,1,datatoplot,[min(bins) max(bins)],cmap0,min(bins),[],0,{'roiname',{'MT_exvivo'},'roicolor',{'w'},'drawrpoinames',0,'roiwidth',{5},'fontsize',20});
+[rawimg,Lookup,rgbimg] = cvnlookup(subjid,1,datatoplot,[min(bins) max(bins)],cmap0,min(bins),[],0,{'roiname',{'MT_exvivo'},'roicolor',{'w'},'drawrpoinames',0,'roiwidth',{5},'fontsize',20});
 
 color = [0.5];
 [r,c,t] = size(rgbimg);
@@ -136,11 +139,11 @@ set(gca,'Fontsize',15)
 setenv('SUBJECTS_DIR',[bidsDir '/derivatives/freesurfer'])
 conditions = {'central_moving';'central_stationary';'left_moving';'left_stationary';'right_moving';'right_stationary'}
 
-resultsdir = sprintf('%s/derivatives/GLMdenoise/%s/%s/',bidsDir,subj,ses);
-fspth = fullfile(bidsDir, 'derivatives', 'freesurfer', subj);
-lcurv = read_curv(fullfile(bidsDir, 'derivatives', 'freesurfer', subj, 'surf', 'lh.curv'));
-rcurv = read_curv(fullfile(bidsDir, 'derivatives', 'freesurfer', subj, 'surf', 'rh.curv'));
-mgz = MRIread(fullfile(bidsDir, 'derivatives', 'freesurfer', subj, 'mri', 'orig.mgz'));
+resultsdir = sprintf('%s/derivatives/GLMdenoise/%s/%s/',bidsDir,subjid,ses);
+fspth = fullfile(bidsDir, 'derivatives', 'freesurfer', subjid);
+lcurv = read_curv(fullfile(bidsDir, 'derivatives', 'freesurfer', subjid, 'surf', 'lh.curv'));
+rcurv = read_curv(fullfile(bidsDir, 'derivatives', 'freesurfer', subjid, 'surf', 'rh.curv'));
+mgz = MRIread(fullfile(bidsDir, 'derivatives', 'freesurfer', subjid, 'mri', 'orig.mgz'));
 leftidx  = 1:numel(lcurv);
 rightidx = (1:numel(rcurv))+numel(lcurv);
 %
@@ -186,10 +189,9 @@ end
 
 %% step 6 - draw some ROIs
 
+
 roilabels = {'hMT';'MST';}
 rng    = [0 2]
-subjid = 'sub-0201';
-ses = 'ses-01';
 resultsdir = sprintf('%s/derivatives/GLMdenoise/%s/%s/',bidsDir,subjid,ses);
 mgznames = {'central_moving_vs_central_stationary';'left_moving_vs_left_stationary';'right_moving_vs_right_stationary'}; 
 for zz = 1:3
