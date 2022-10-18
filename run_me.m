@@ -9,8 +9,10 @@ subjid = 'sub-0201';
 ses = 'ses-01';
 
   %%%%%%%%%%%%%%%%%
-% Download the data %https://drive.google.com/file/d/1Ot5_QWl6whpB5qEXUEwQuzUJyis-oKJp/view?usp=sharing
+% Download the data 
+% https://drive.google.com/file/d/1Ot5_QWl6whpB5qEXUEwQuzUJyis-oKJp/view?usp=sharing
   %%%%%%%%%%%%%%%%%
+  
 % define path to the downloaded folder here:
 bidsDir = '/Users/pw1246/Desktop/glm-Localizer-Tutorial-Data';
 
